@@ -1,41 +1,49 @@
 const WebSocket = require('ws');
-const sqlite3 = require('sqlite3').verbose();
+const { queue } = require('./bot.js');
+// Configure a DataBase
+
 
 const PORT = 5000;
-const wsServer = new WebSocket.Server({ port: PORT });
 
-const db = new sqlite3.Database('messages.db');
-db.run('CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY, firstName TEXT, text TEXT)');
+const wsServer = new WebSocket.Server({
+    port: PORT
+});
 
 wsServer.on('connection', function (socket) {
     console.log("A client just connected");
 
-    // Retrieve all messages from the database and send them to the client
-    db.all('SELECT * FROM messages', [], (err, rows) => {
-        if (err) {
-            throw err;
-        }
 
-        const messages = rows.map(row => ({
-            firstName: row.firstName,
-            text: row.text
-        }));
+    // Commented as Clint never Speaks
+    // socket.on('message', async function (msg) {
+    //     console.log("Received message from client: "  + msg);
 
-        const response = {
-            type: 'allMessages',
-            messages: messages
-        };
+    //     // Broadcast that message to all connected clients
+    //     wsServer.clients.forEach(function (client) {
+    //         client.send("Someone said: " + msg);
+    //     });
 
-        socket.send(JSON.stringify(response));
-    });
-
-    socket.on('message', function (msg) {
-        console.log("Received message from client: " + msg);
-    });
+    //     // Add the message to the queue
+    //     await queue.add({ firstName: 'Server', text: msg });
+    // });
 
     socket.on('close', function () {
         console.log('Client disconnected');
-    });
+    })
 });
 
-module.exports = { wsServer, db };
+// Process messages from the queue
+queue.process(async (job) => {
+    try {
+        const messageContent = job.data;
+        console.log(`Message received from ${messageContent.firstName}: ${messageContent.text}`);
+
+        // Send the message to all connected clients
+        wsServer.clients.forEach(function (client) {
+            client.send(`${messageContent.firstName} says: ${messageContent.text}`);
+        });
+    } catch (error) {
+        console.error('Error processing job:', error);
+    }
+});
+
+console.log( (new Date()) + " Server is listening on port " + PORT);

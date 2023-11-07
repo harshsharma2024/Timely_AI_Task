@@ -1,6 +1,9 @@
+
 const WebSocket = require('ws');
 
 const serverAddress = "ws://127.0.0.1:5000";
+// const serverAddress = 'wss://simple-websocket-server-echo.glitch.me/';
+
 const ws = new WebSocket(serverAddress, {
     headers: {
         "user-agent": "Mozilla"
@@ -8,20 +11,9 @@ const ws = new WebSocket(serverAddress, {
 });
 
 ws.on('open', function() {
-    console.log("Connected to server");
+    ws.send("WELCOME TO THE SERVER");
 });
 
 ws.on('message', function(msg) {
-    const message = JSON.parse(msg);
-
-    if (message.type === 'allMessages') {
-        const messages = message.messages;
-
-        messages.forEach((msg) => {
-            const firstName = msg.firstName;
-            const text = msg.text;
-
-            console.log(`Received message from ${firstName}: ${text}`);
-        });
-    }
+    console.log("Received msg from the server: " + msg);
 });
