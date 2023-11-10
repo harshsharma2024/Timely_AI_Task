@@ -8,8 +8,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "better-sqlite3": "^9.0.0",
     "bull": "^4.11.4",
     "node-telegram-bot-api": "^0.64.0",
+    "pg": "^8.11.3",
     "socks5-https-client": "^1.2.1",
     "sqlite3": "^5.1.6",
     "ws": "^8.14.2"
