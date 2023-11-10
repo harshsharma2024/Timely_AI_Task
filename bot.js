@@ -1,7 +1,10 @@
 const TelegramBot = require('node-telegram-bot-api');
 const Queue = require('bull');
 
-const token = '6526118471:AAEMgLkPjOwGyGxeH8OKoDerstUX3wQhyV0';
+require('dotenv').config();
+
+const token = process.env.API_KEY;
+
 const bot = new TelegramBot(token, { polling: true });
 
 const queue = new Queue('messages', {

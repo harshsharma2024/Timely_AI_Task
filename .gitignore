@@ -1,0 +1,7 @@
+node_modules
+
+.env
+
+messages.db.db
+
+temp_bot.js
